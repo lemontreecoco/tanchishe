@@ -1,0 +1,327 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<title>贪吃蛇</title>
+</head>
+<style>
+    *{
+    	margin: 0;
+    	padding: 0;
+    	list-style: none;
+    	font-family: "微软雅黑";
+    }
+    body{
+    	background-image: url(pt/lbj4.jpg);
+    }
+	#sence{
+		width: 600px;
+		height:600px;
+		position: absolute;
+		background: #68D730;
+		border-left:1px solid #68D730;
+		border-top:1px solid #68D730;
+		margin:auto;
+		top:0;
+		bottom: 0;
+		left:0;
+		right:0;
+	}
+    .block{
+    	width: 29px;
+        height: 29px;
+        float: left;
+        background-image: url(pt/caodi.jpg);
+		margin: 0 1px 1px 0;
+		overflow: hidden;
+        background-repeat: no-repeat;
+        background-size: 100%;
+    }
+     .shiwu{
+    	width: 30px;
+    	height: 30px;
+    	float: left;
+    	background-image: url(pt/hzs.png);
+        background-repeat: no-repeat;
+        background-size: 100%;
+    }
+    .she{
+    	width: 30px;
+    	height: 30px;
+        float: left;
+        background-image: url(pt/zs1.png);
+        background-repeat: no-repeat;
+        background-size: 100%;
+    }
+    .nav{
+    	width: 260px;
+    	height: 600px;
+    	/*background: #B2F2FC;*/
+    	position: absolute;
+    	margin:auto;
+    	top:0;
+    	bottom:0;
+    	left:60px;
+    	text-align: center;
+    	margin-top: 35px;
+        /*border-radius: 20%;*/
+    }
+    #first{
+    	margin-top: 45px;
+    	background-image: url(pt/lan7.png);
+    	height: 25px;
+    	background-size: 100%;
+    }
+    .nav li{
+    	width: 150px;
+    	margin-left: 55px;
+    	padding: 10px 0;
+        /*background:#FEC12F;*/
+        margin-top: 28px;
+        color: #fff;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+        font-family: "方正毡笔黑简体";
+    }
+    #hangxuanze{
+    	outline: none;
+    	border:none;
+    	margin: 35px 0;
+    	height: 25px;
+        font-color:#fff;
+        background:#FEC12F;
+    	border-bottom: 1px solid #FEC12F;
+    }
+    .nav .active{
+    	background-image: url(pt/lan8.png);
+    	height: 25px;
+    	background-size: 100%;
+        z-index: 2;
+    }
+    .nav .sanshi{
+        background-image: url(pt/lan3.png);
+    	height: 25px;
+    	background-size: 100%;
+    }
+    .start,.stop,.restart{
+    	font-family: "方正毡笔黑简体";
+    	font-size: 35px;
+    }
+    .start{
+        background-image: url(pt/kaishi.png);
+    	height: 25px;
+    	background-size: 100%;
+    }
+    .stop{
+    	background-image: url(pt/zant.png);
+    	height: 25px;
+    	background-size: 100%;
+    }
+    .restart{
+    	background-image: url(pt/cxks.png);
+    	height: 25px;
+    	background-size: 100%;
+    }
+    .failure-sence{
+        width: 450px;
+        height: 265px;
+        position: absolute;
+        margin:auto;
+        top:0;
+        bottom:0;
+        left:0;
+        right:0;
+        background-image: url(pt/failture2.png);
+        background-size: 100%;
+        display: none;
+    }
+    .fail-button1{
+        width: 165px;
+        height: 45px;
+        float: left;
+        margin-top: 138px;
+        margin-left: 58px;
+        background-image: url(pt/failture3.png);
+        background-size: 100%;
+    }
+    .fail-button2{
+        width: 165px;
+        height: 45px;
+        float: left;
+        margin-top: 138px;
+        margin-left: 3px;
+        background-image: url(pt/failture4.png);
+        background-size: 100%;
+    }
+</style>
+<body>
+	<ul class="nav">
+		<li data-role="15" id="first"></li>
+		<li data-role="20" class="active"></li>
+		<li data-role="30" class="sanshi"></li>
+		<input type="text" id="hangxuanze" placeholder="请输入5-40以内数字">
+		<li class="start"></li>
+		<li class="stop"></li>
+		<li class="restart"></li>
+	</ul>
+	<div id="sence">
+	</div>
+    <div class="failure-sence">
+        <div class="failture-button">
+            <div class="fail-button1"></div>
+            <div class="fail-button2"></div>
+        </div>
+    </div>
+</body>
+<script src="jquery工程文件/jquery-1.12.0.js"></script>
+<script>
+	$(function(){
+		var xy2id = function(i,j){
+			return i+'-'+j;
+		}
+		// 全局变量
+		var hang=20;
+		var she=[{x:0,y:0},{x:0,y:1},{x:0,y:2}];
+		var shiwu={};
+		var timerId;
+        //画场景
+		var huachangjing=function(hang){
+  	        hang=hang || 20;
+			var sence=$('#sence');
+			sence.empty();
+			var wh = Math.floor(600/hang);
+			for(var i=0;i<hang;i++){
+				for(var j=0;j<hang;j++){
+					$('<div>')
+					.addClass('block')
+					.attr('id',xy2id(i,j))
+					.width(wh-1)
+					.height(wh-1)
+					.appendTo(sence);
+				}
+			}
+			sence.width(wh*hang).height(wh*hang);
+        }
+		huachangjing();
+		//写行数
+		$('#hangxuanze').bind('keydown',function(e){
+			if(e.keyCode == 13){
+				hang = $(this).val();
+				if(!isNaN(hang) && hang>=15 && hang<=40){
+					huachangjing(hang);
+					shiwu=fangshiwu();
+					drawshe();
+				}else{
+					alert('请重新输入');
+					$(this).val('');
+                    hang=20;
+                    huachangjing(hang);
+                    shiwu=fangshiwu();
+                    drawshe();
+				}
+			}
+		})
+        //选行数
+        $('li[data-role]').bind('click',function(){
+        	hang=Number($(this).attr('data-role'));
+        	$('li.active').removeClass('active');
+			$(this).addClass('active');
+			huachangjing(hang);
+			shiwu=fangshiwu();
+			drawshe();
+        });
+        //开始游戏
+        var start=function(){
+        	clearInterval(timerId);
+        	timerId=setInterval(move,200);
+        }
+        $('.start').bind('click',start);
+        //暂停游戏
+        var stop=function(){
+        	clearInterval(timerId);
+        }
+        $('.stop').bind('click',stop);
+
+		//放蛇和食物
+		var drawshe=function(){
+			she.forEach(function(v){
+				$('#'+xy2id(v.x,v.y)).addClass('she');
+			});
+		}
+		drawshe();
+		var fangshiwu=function(){
+			var _x=Math.floor(Math.random()*hang);
+			var _y=Math.floor(Math.random()*hang);
+			$('#'+xy2id(_x,_y)).addClass('shiwu');
+			return {x:_x,y:_y}
+		};
+		shiwu=fangshiwu();
+		//重新开始
+        var restart=function(){
+        	$('.she').removeClass('she');
+        	$('.shiwu').removeClass('shiwu');
+        	she=[{x:0,y:0},{x:0,y:1},{x:0,y:2}];
+        	huachangjing(hang);
+        	drawshe();
+        	shiwu=fangshiwu();
+        }
+        $('.restart').bind('click',function(){
+            restart();
+            start();
+        });
+		//让蛇动
+		var fangxiang='you';//右
+		var  move=function(){
+			var jiutou=she[she.length-1];
+            if(fangxiang==='you'){
+           	    var xintou={x:jiutou.x,y:jiutou.y+1};
+			}else if(fangxiang==='xia'){
+				var xintou={x:jiutou.x+1,y:jiutou.y};
+			}else if(fangxiang==='zuo'){
+				var xintou={x:jiutou.x,y:jiutou.y-1};
+			}else if(fangxiang==='shang'){
+                var xintou={x:jiutou.x-1,y:jiutou.y};
+			}
+			// 吃食物
+			if(xintou.x===shiwu.x && xintou.y===shiwu.y){
+				she.push(xintou);
+	            $('#'+xintou.x+'-'+xintou.y)
+	            .removeClass('shiwu')
+	            .addClass('she')
+	            shiwu=fangshiwu();
+	        }else{
+	        	she.push(xintou);
+				$('#'+xy2id(xintou.x,xintou.y)).addClass('she');
+				var weiba=she.shift();
+				$('#'+xy2id(weiba.x,weiba.y)).removeClass('she');
+	        }
+	        //撞墙
+	        console.log(hang);
+	        if(xintou.x<0 || xintou.x>=hang-1 || xintou.y<0 || xintou.y>=hang-1){
+            	clearInterval(timerId);
+                $('.failure-sence').show();
+            	return;
+	        }
+		}
+        //改变方向
+		$(document).bind('keydown',function(e){
+			if(Math.abs(e.keyCode-fangxiang)===2){
+				return;
+			}
+			if(e.keyCode<37 || e.keyCode>40){
+				return;
+			}
+			var dict={39:'you',37:'zuo',38:'shang',40:'xia'}
+			fangxiang=dict[e.keyCode]
+		});
+		timerId=setInterval(move,200)
+        //失败页面
+        $('.fail-button1').bind('click',function(){
+            $('.failure-sence').hide();
+            start();
+            restart();
+        })
+    })
+</script>
+</html>
