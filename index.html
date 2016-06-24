@@ -225,7 +225,7 @@
         //选行数
         $('li[data-role]').bind('click',function(){
         	hang=Number($(this).attr('data-role'));
-        	$('li.active').removeClass('active');
+        	// $('li.active').removeClass('active');
 			$(this).addClass('active');
 			huachangjing(hang);
 			shiwu=fangshiwu();
@@ -321,6 +321,15 @@
             $('.failure-sence').hide();
             start();
             restart();
+        })
+				$('.fail-button2').bind('click',function(){
+					$('.failure-sence').hide();
+					$('.she').removeClass('she');
+        	$('.shiwu').removeClass('shiwu');
+        	she=[{x:0,y:0},{x:0,y:1},{x:0,y:2}];
+        	huachangjing(hang);
+        	drawshe();
+        	shiwu=fangshiwu();
         })
     })
 </script>
